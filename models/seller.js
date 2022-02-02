@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const User = require('../^/untitled/Untitled-1')
+
 
 const sellerSchema = new mongoose.Schema({
     sellerId: {
@@ -21,15 +21,16 @@ const sellerSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: [6,"Minimum password length is 6 characters!"],
-        maxlength: [25,"Maximum password length is 25 characters!"]
+        minlength: [6,"Minimum password length is 6 characters!"]
     },
     token: {
+        default:null,
         type: String,
-        required: true        
+             
     }
 
 })
+
 
 sellerSchema.methods.toJSON = function(){
     const seller = this
@@ -41,23 +42,28 @@ sellerSchema.methods.toJSON = function(){
     return sellerObject
 }
 
-seller.methods.generateAuthToken = async function(){
+sellerSchema.methods.generateAuthToken = async function(){
     const seller = this
     const token = jwt.sign({ _id: seller._id.toString()}, process.env.JWT_SECRET)
     seller.token = token
     await seller.save()
-
     return token
 }
 
 sellerSchema.statics.findByCredentials = async (sellerId,password) => {
     const seller = await Seller.findOne({ sellerId })
     if (!seller){
-        throw new Error("Seller not found!")
+        const sellerError = Error.prototype
+        sellerError.message = "Seller not found!"
+        sellerError.name = "LoginError"
+        throw sellerError
     }
     const isMatch = await bcrypt.compare(password, seller.password)
     if (!isMatch) {
-        throw new Error('Unable to login')
+        const sellerError = Error.prototype
+        sellerError.message = "Unable to login!"
+        sellerError.name = "LoginError"
+        throw sellerError
     }
     return seller
 }
