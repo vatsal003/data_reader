@@ -11,8 +11,10 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 
 const sellerRoutes = require("./routes/seller")
+const productRoutes = require("./routes/product")
 
 app.use("/sellers",sellerRoutes)
+app.use("/products",productRoutes)
 
 const port = process.env.PORT || 3000
 
