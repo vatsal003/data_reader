@@ -9,7 +9,7 @@ router.post('/register', async(req, res) => {
         req.body.sellerId ? sellerBody.sellerId = req.body.sellerId : errormsg += "Seller ID missing!\n"
         req.body.password ? sellerBody.password = req.body.password : errormsg += "Password missing!\n"
         if(errormsg != ""){
-            return {error:errormsg}
+            return res.status(400).send({error:errormsg})
         }
         const result = await SellerService.register(sellerBody)
         if (result.seller) {
